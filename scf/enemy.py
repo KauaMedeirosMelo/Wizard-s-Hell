@@ -40,7 +40,6 @@ class Enemy():
         self.x = x
         self.y = y
         self.sprite = sprite
-        print("posX: {}, posY: {}".format(self.sprite.x, self.sprite.y))
 
     def collision(self):
         pass
@@ -50,5 +49,4 @@ class Enemy():
 
     def render(self):
         self.sprite.draw()
-        #print("posX: {}, posY: {}".format(self.sprite.x, self.sprite.y))
         pass
