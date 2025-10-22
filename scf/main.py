@@ -1,43 +1,36 @@
 from pplay import window, sprite, mouse
 import os
-import entity, tower
+import entity, tower, background, enemy, toolbar
 
 screen = window.Window(1200, 800)
+mouse.Mouse.hide(mouse)
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 res_access = os.path.join(base_dir, "..", "res") + "\\"
 
 mouse_mask = sprite.Sprite(res_access+"mouse.png")
 
-def start_game():
-    for i in range(3):
-        for j in range(3):
-            entity.towers[i][j] = tower.Tower(200+60*i, 160+60*j, sprite.Sprite(res_access+"torre1.png"))
-    pass
+background.start()
+tower.start_towers(screen)
+enemy.generate_enemies(screen)
+toolbar.init_sprites(screen)
 
-start_game()
+toolbar.visible = True
+
+def tick():
+    mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
+    entity.tick(mouse_mask)
+
+def render():
+    background.render()
+    entity.render()
+    toolbar.render()
+    mouse_mask.draw()
+    screen.update()
 
 while(True):
 
+    tick()
+    render()
 
-    #TICK
-    mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
-
-
-    for i in range(len(entity.towers)):
-        for j in range(len(entity.towers[i])):
-            entity.towers[i][j].tick(mouse_mask)
-
-
-
-
-    #RENDER
-    screen.set_background_color((0,0,0))
-
-    for i in range(len(entity.towers)):
-        for j in range(len(entity.towers[i])):
-            entity.towers[i][j].render()
-            #print("i: {}, j: {}".format(i, j))
-
-    screen.update()
     pass
