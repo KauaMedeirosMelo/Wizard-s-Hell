@@ -1,11 +1,9 @@
 from pplay import sprite
-import os, random
+import random
 import entity
+from resacc import res_access
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-res_access = os.path.join(base_dir, "..","res") + "\\"
-
-def generate_enemies(screen):
+def generate_enemies(screen, res_access):
     N = random.randint(0, 20)
     N = 20
     for i in range(N):

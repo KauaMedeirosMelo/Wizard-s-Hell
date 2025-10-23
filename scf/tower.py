@@ -1,11 +1,8 @@
 from pplay import sprite
-import os
 import entity
+from resacc import res_access
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-res_access = os.path.join(base_dir, "..","res") + "\\"
-
-def start_towers(screen):
+def start_towers(screen, res_access):
     for i in range(3):
         for j in range(3):
             my_sprite = sprite.Sprite(res_access+"torre1.png")

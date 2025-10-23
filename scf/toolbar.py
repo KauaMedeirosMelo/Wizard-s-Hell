@@ -1,15 +1,11 @@
 from pplay import sprite
-import os
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-res_access = os.path.join(base_dir, "..", "res") + "\\"
 
 tower_stats = None
 visible = False
 
 toolbar = None
 
-def init_sprites(screen):
+def init_sprites(screen, res_access):
     global tower_stats, toolbar
 
     tower_stats = sprite.Sprite(res_access+"tower_stats.png")
