@@ -1,27 +1,29 @@
 from pplay import sprite
-import random
+import random, math
+from datetime import datetime
 import entity
 from resacc import res_access
+from toolbar import exp
 
-def generate_enemies(screen, res_access):
-    N = random.randint(0, 20)
-    N = 20
+def generate_enemies(screen, res_access, N):
+    random.seed(str(datetime.now()))
     for i in range(N):
         my_sprite = sprite.Sprite(res_access+"enemy1.png")
         UD = random.randint(0, 1)
         LF = random.randint(0, 1)
 
         if(UD):
-            posX = random.randint(int(screen.width*(2/3)), screen.width)
+            posX = random.randint(int(screen.width*(8/9)), screen.width)
         else:
-            posX = random.randint(0, int(screen.width*(1/3)))
+            posX = random.randint(0, int(screen.width*(1/9)))
 
         if(LF):
-            posY = random.randint(int(screen.height*(2/3)), screen.height)
+            posY = random.randint(int(screen.height*(8/9)), screen.height)
         else:
-            posY = random.randint(0, int(screen.height*(1/3)))
+            posY = random.randint(0, int(screen.height*(1/9)))
 
         entity.enemies.append(Enemy(posX, posY, my_sprite))
+        entity.enemies[-1].set_move(screen.width/2, screen.height/2)
         
 
     return
@@ -38,11 +40,48 @@ class Enemy():
         self.x = x
         self.y = y
         self.sprite = sprite
+        self.die = False
+
+
+    def set_move(self, endX, endY):
+        distance = ((self.x - endX)**2 + (self.y - endY)**2)**(1/2)
+        if(distance > 0):
+            dot_product = (abs(self.x - endX) * 1)
+            if(self.x > endX):
+                angle = math.acos(dot_product/((distance)))
+            else:
+                angle = math.acos(dot_product/(distance*-1))
+            dir = 1
+            if(self.y > endY):
+                dir = -1
+            
+            self.angle = angle
+            self.dir = dir
+            self.speed = 10
+
+    def move(self, dt):
+        self.x = self.x - math.cos(self.angle)*self.speed*dt
+        self.y = self.y + math.sin(self.angle)*self.speed*self.dir*dt
+        self.sprite.x = self.x
+        self.sprite.y = self.y
 
     def collision(self):
+        for i in range(len(entity.towers)):
+            for j in range(len(entity.towers[i])):
+                if(self.sprite.collided(entity.towers[i][j].sprite)):
+                    self.die = True
+                    exp[0] -= 30
+                for k in entity.towers[i][j].bullets:
+                    distance = ((self.x - k.x[0])**2 + (self.y - k.y[0])**2)**(1/2)
+                    if(distance < 20+k.size):
+                        self.die = True
+                        k.life -= 1
+                        exp[0] += 15
         pass
 
-    def tick(self):
+    def tick(self, dt):
+        self.move(dt)
+        self.collision()
         pass
 
     def render(self):

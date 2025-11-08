@@ -1,7 +1,7 @@
 from pplay import window, sprite, mouse
 from pygame import display, NOFRAME
-from resacc import res_access, change_access, change_models
-import entity, tower, background, enemy, toolbar
+from resacc import res_access, change_access
+import entity, tower, background, enemy, toolbar, models, card
 
 event = False
 
@@ -13,15 +13,25 @@ key = screen.get_keyboard()
 
 background.start(res_access[0])
 tower.start_towers(screen, res_access[0])
-enemy.generate_enemies(screen, res_access[0])
+enemy.generate_enemies(screen, res_access[0], 5)
 toolbar.init_sprites(screen, res_access[0])
-toolbar.visible = True
 
-mouse_mask = sprite.Sprite(res_access[0]+"mouse.png")
+timer = 0
+num = 5
 
 def tick():
-    mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
-    entity.tick(mouse_mask)
+    global timer, num
+
+    dt = screen.delta_time()
+    timer += dt
+
+    if(timer >= 15):
+        enemy.generate_enemies(screen, res_access[0],num)
+        num = num+2
+        timer = 0
+    
+    entity.tick(toolbar.mouse_mask, dt)
+    card.tick(screen, res_access[0], toolbar.mouse_mask, dt)
     if(key.key_pressed("esc")):
         screen.close()
 
@@ -32,19 +42,34 @@ def tick():
         change_access("models")
 
     if(key.key_pressed("space")):
-        change_models(screen)
+        models.change_models(screen)
+
+    toolbar.tick(res_access[0])
+    if(toolbar.exp[0] <= 0):
+        screen.close()
+
+    if(toolbar.click):
+        for i in range(len(entity.towers)):
+            for j in range(len(entity.towers[i])):
+                if(entity.towers[i][j].collision(toolbar.mouse_mask)):
+                    toolbar.visible = True
+                    toolbar.show_stats[0] = entity.towers[i][j].size
+                    toolbar.show_stats[1] = entity.towers[i][j].speed
+                    toolbar.show_stats[2] = entity.towers[i][j].cooldown
 
 
-def render():
+def render(screen):
+    screen.set_background_color((0,0,0))
     background.render()
-    entity.render()
-    toolbar.render()
-    mouse_mask.draw()
+    entity.render(screen)
+    toolbar.render(screen)
+    card.render(screen)
+    toolbar.mouse_mask.draw()
     screen.update()
 
 while(True):
 
     tick()
-    render()
+    render(screen)
     
     pass
