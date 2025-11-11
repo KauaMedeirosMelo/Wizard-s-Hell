@@ -3,7 +3,7 @@ import random, math
 from datetime import datetime
 import entity
 from resacc import res_access
-from toolbar import exp
+from toolbar import exp, exp_change
 
 def generate_enemies(screen, res_access, N):
     random.seed(str(datetime.now()))
@@ -76,7 +76,7 @@ class Enemy():
                     if(distance < 20+k.size):
                         self.die = True
                         k.life -= 1
-                        exp[0] += 15
+                        exp[0] += 15/exp_change
         pass
 
     def tick(self, dt):

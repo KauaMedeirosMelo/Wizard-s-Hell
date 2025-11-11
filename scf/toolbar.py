@@ -1,7 +1,6 @@
 from pygame import draw, surface, SRCALPHA
 from pplay import sprite, mouse
 import tower
-import math
 
 mouse_mask = None
 tower_stats = None
@@ -25,6 +24,7 @@ shoot = False
 posX1 = posX2 = posY1 = posY2 = 0
 
 exp = [100]
+exp_change = 1
 
 show_stats = [0,0,0]
 
@@ -36,9 +36,6 @@ def init_sprites(screen, res_access):
 
     mouse_mask = sprite.Sprite(res_access+"mouse.png")
 
-    tower_stats = sprite.Sprite(res_access+"tower_stats.png")
-    tower_stats.x = screen.width - tower_stats.width*1.25
-    tower_stats.y = 20 + tower_stats.height*1.2*3
 
     toolbar1 = sprite.Sprite(res_access+"toolbar.png")
     toolbar2 = sprite.Sprite(res_access+"toolbar.png")
@@ -46,8 +43,12 @@ def init_sprites(screen, res_access):
     toolbar2.x = 850
     toolbar1.y = 0
     toolbar2.y = 0
+    
+    tower_stats = sprite.Sprite(res_access+"tower_stats.png")
+    tower_stats.x = toolbar1.width/2 - tower_stats.width/2
+    tower_stats.y = 20 + tower_stats.height*1.2*3
 
-def tick(res_access):
+def tick(res_access, screen):
     global visible, mouse_mask, key, mode, mouse_pressed, key_pressed, key_released, click, selection, aim, shoot, posX1, posX2, posY1, posY2
 
     mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
@@ -66,6 +67,7 @@ def tick(res_access):
             mouse_mask = sprite.Sprite(res_access+"mouse_selection.png")
             mouse_mask.x = posX2
             mouse_mask.y = posY2
+            visible = False
         mode = 1
     elif(key.key_pressed("2")):
         if(not key_pressed):
@@ -74,6 +76,7 @@ def tick(res_access):
             mouse_mask = sprite.Sprite(res_access+"mouse.png")
             mouse_mask.x = posX2
             mouse_mask.y = posY2
+            visible = False
         mode = 2
     elif(key.key_pressed("3")):
         if(not key_pressed):
@@ -154,6 +157,6 @@ def render(screen):
 
     if(visible):
         tower_stats.draw()
-        screen.draw_text(str(show_stats[0]), tower_stats.x + 20, tower_stats.y + 10, 20, (255, 0, 0))
-        screen.draw_text(str(show_stats[1]), tower_stats.x + 20, tower_stats.y + 40, 20, (0, 255, 0))
-        screen.draw_text(str(show_stats[2]), tower_stats.x + 20, tower_stats.y + 70, 20, (0, 0, 255))
+        screen.draw_text(str(int(show_stats[0])), tower_stats.x + 20, tower_stats.y + 10, 20, (255, 0, 0))
+        screen.draw_text(str(int(show_stats[1])), tower_stats.x + 20, tower_stats.y + 40, 20, (0, 255, 0))
+        screen.draw_text(str(int(show_stats[2])), tower_stats.x + 20, tower_stats.y + 70, 20, (0, 0, 255))

@@ -13,6 +13,7 @@ def render(screen):
 def tick(screen, res_access, mouse_mask, dt):
     if(toolbar.exp[0] >= 200):
         toolbar.exp[0] = 100
+        toolbar.exp_change += 0.2
         new_cards(screen, res_access)
     for i in cards:
         i.tick(mouse_mask, dt)

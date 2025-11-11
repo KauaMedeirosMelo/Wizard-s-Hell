@@ -19,8 +19,9 @@ toolbar.init_sprites(screen, res_access[0])
 timer = 0
 num = 5
 
+
 def tick():
-    global timer, num
+    global timer, num, myX, myY
 
     dt = screen.delta_time()
     timer += dt
@@ -44,11 +45,11 @@ def tick():
     if(key.key_pressed("space")):
         models.change_models(screen)
 
-    toolbar.tick(res_access[0])
+    toolbar.tick(res_access[0], screen)
     if(toolbar.exp[0] <= 0):
         screen.close()
 
-    if(toolbar.click):
+    if(toolbar.click and toolbar.mode == 3):
         for i in range(len(entity.towers)):
             for j in range(len(entity.towers[i])):
                 if(entity.towers[i][j].collision(toolbar.mouse_mask)):

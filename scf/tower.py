@@ -3,7 +3,7 @@ from pplay import sprite
 import entity
 from resacc import res_access
 import random as rand
-import math
+import math, datetime
 
 def start_towers(screen, res_access):
     for i in range(3):
@@ -70,12 +70,12 @@ class Tower():
         self.max_bullets = 3
 
         self.size = 5
-        self.speed = 1
+        self.speed = 0.8
 
         self.stats = []
         self.bullets = []
 
-
+        self.auto_shoot = False
 
 
     def collision(self, obj):
@@ -87,7 +87,7 @@ class Tower():
         self.reload+=dt
         if(self.reload >= self.cooldown):
             if(len(self.bullets) < self.max_bullets):
-                self.reload = 0
+                self.reload = rand.randint(-8, 0)/10
                 self.generate_bullet()
 
         if(self.collision(mouse)):
@@ -115,6 +115,25 @@ class Tower():
         bX = self.x + rand.randint(-20, 60)
         bY = self.y + rand.randint(-20, 60)
         self.bullets.append(Bullet(bX, bY, self.size, self.stats))
+        if(self.auto_shoot):
+            rand.seed(str(datetime.datetime.now()))
+            n = rand.randint(0, len(entity.enemies)-1)
+            posX1 = self.bullets[-1].x[-1]
+            posY1 = self.bullets[-1].y[-1]
+            posX2 = entity.enemies[n].x
+            posY2 = entity.enemies[n].y
+            distance = ((posX1 - posX2)**2 + (posY1 - posY2)**2)**(1/2)
+            if(distance > 0):
+                dot_product = (abs(posX1 - posX2) * 1)
+                if(posX1 > posX2):
+                    angle = math.acos(dot_product/((distance)))
+                else:
+                    angle = math.acos(dot_product/(distance*-1))
+                dir = 1
+                if(posY2 > posY1):
+                    dir = -1
+            self.bullets[-1].dir = dir
+            self.bullets[-1].set_move(angle, (distance*100)**(1/5) * self.speed*20)
         pass
 
 
@@ -130,6 +149,10 @@ class Bullet():
     def __init__(self, x, y, size, stats):
         self.x = []
         self.y = []
+
+        self.orbX = x - 500
+        self.orbY = y - 350
+
         self.x.append(x)
         self.y.append(y)
         
@@ -138,34 +161,74 @@ class Bullet():
         self.size = size
         self.stats = stats
 
+
+        self.linear = True
+        self.orbit_timer = 0
+
     def set_move(self, angle, speed):
         self.angle = angle
         self.speed = speed
         self.moving = True
+        self.signal = self.dir/abs(self.dir)
+        print(self.signal)
 
     def move(self, dt):
-        if(len(self.x) < math.log2(self.speed) - 8):
-            self.x.append(self.x[-1])
-            self.y.append(self.y[-1])
+        if(self.linear):
+            if(len(self.x) < math.log2(self.speed) - 8):
+                self.x.append(self.x[-1])
+                self.y.append(self.y[-1])
 
-            self.x[-1] = self.x[-2] - math.cos(self.angle)*self.speed/20
-            self.y[-1] = self.y[-2] - math.sin(self.angle)*self.speed*self.dir/20
+                self.x[-1] = self.x[-2] - math.cos(self.angle)*self.speed/20
+                self.y[-1] = self.y[-2] - math.sin(self.angle)*self.speed*self.dir/20
+            else:
+                for i in range(len(self.x)):
+                    self.x[i] = self.x[i] + math.cos(self.angle)*self.speed*dt
+                    self.y[i] = self.y[i] + math.sin(self.angle)*self.speed*self.dir*dt
+        
+        elif(self.orbit_timer >= 0.3):
+            valX = self.orbX
+            valY = self.orbY
+            
+            mydt = dt * math.log2(self.speed/100) * self.signal
+
+            cX = (math.cos(mydt)*valX - math.sin(mydt)*valY)
+            cY = (math.cos(-mydt)*valY + math.sin(mydt)*valX)
+
+            self.x[-1] += cX - self.orbX
+            self.y[-1] += cY - self.orbY
+            self.orbX = cX
+            self.orbY = cY
+            
         else:
-            for i in range(len(self.x)):
-                self.x[i] = self.x[i] + math.cos(self.angle)*self.speed*dt
-                self.y[i] = self.y[i] + math.sin(self.angle)*self.speed*self.dir*dt
+            self.orbit_timer = self.orbit_timer + dt
+
+            cX = self.orbX + math.cos(self.angle)*self.speed*dt
+            cY = self.orbY + math.sin(self.angle)*self.speed*self.dir*dt
+
+            self.x[-1] += cX - self.orbX
+            self.y[-1] += cY - self.orbY
+            self.orbX = cX
+            self.orbY = cY
+
+
 
     def tick(self, dt):
         if(self.moving):
             self.move(dt)
-        if(self.life <= 0 or self.x[0] < -50 or self.x[0] > 1300 or self.y[0] < -50 or self.y[0] > 1300):
+        if(self.linear):
+            if(self.x[0] < -50 or self.x[0] > 1300 or self.y[0] < -50 or self.y[0] > 1300):
+                self.die = True
+        elif(self.life <= 0):
             self.die = True
     
     def render(self, screen):
         if(self.selected):
-            draw.circle(screen.get_screen(), (0, 0, 255), (self.x[0], self.y[0]), self.size + 2)
-        for i in range(len(self.x)):
-            #draw.circle(screen.get_screen(), (0, 0, 255), (self.x[i], self.y[i]), self.size)
-            circle_surface = surface.Surface((self.size*2, self.size*2), SRCALPHA)
-            draw.circle(circle_surface, (250, 250, 250, 255/(i+1)), (self.size, self.size), self.size)
-            screen.screen.blit(circle_surface, (self.x[i]-self.size, self.y[i]-self.size))
+            draw.circle(screen.get_screen(), (255, 255, 255), (self.x[0], self.y[0]), self.size + 2)
+        if(not self.moving or self.linear):
+            for i in range(len(self.x)):
+                #draw.circle(screen.get_screen(), (0, 0, 255), (self.x[i], self.y[i]), self.size)
+                circle_surface = surface.Surface((self.size*2, self.size*2), SRCALPHA)
+                draw.circle(circle_surface, (0, 0, 250, 255/(i+1)), (self.size, self.size), self.size)
+                screen.screen.blit(circle_surface, (self.x[i]-self.size, self.y[i]-self.size))
+        else:
+            draw.circle(screen.get_screen(), (0, 0, 250), (screen.width/2 + self.orbX, screen.height/2 + self.orbY), self.size)
