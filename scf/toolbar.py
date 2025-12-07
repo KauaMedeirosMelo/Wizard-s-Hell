@@ -1,11 +1,15 @@
 from pygame import draw, surface, SRCALPHA
 from pplay import sprite, mouse
 import tower
+from card import new_cards
+from entity import towers
+import math
 
 mouse_mask = None
 tower_stats = None
 toolbar1 = None
 toolbar2 = None
+dice = None
 
 visible = False
 
@@ -24,13 +28,17 @@ shoot = False
 posX1 = posX2 = posY1 = posY2 = 0
 
 exp = [100]
-exp_change = 1
+exp_change = [1]
+
+score = [0]
+game_timer = [0]
 
 show_stats = [0,0,0]
-
+towerI = 0
+towerJ = 0
 
 def init_sprites(screen, res_access):
-    global mouse_mask, tower_stats, toolbar1, toolbar2, key
+    global mouse_mask, tower_stats, toolbar1, toolbar2, dice, key
 
     key = screen.get_keyboard()
 
@@ -48,8 +56,12 @@ def init_sprites(screen, res_access):
     tower_stats.x = toolbar1.width/2 - tower_stats.width/2
     tower_stats.y = 20 + tower_stats.height*1.2*3
 
+    dice = sprite.Sprite(res_access+"dice.png")
+    dice.x = screen.width - dice.width*2
+    dice.y = screen.height - dice.height*1.5
+
 def tick(res_access, screen):
-    global visible, mouse_mask, key, mode, mouse_pressed, key_pressed, key_released, click, selection, aim, shoot, posX1, posX2, posY1, posY2
+    global visible, mouse_mask, key, mode, mouse_pressed, key_pressed, key_released, click, selection, aim, shoot, posX1, posX2, posY1, posY2, dice
 
     mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
 
@@ -125,6 +137,12 @@ def tick(res_access, screen):
                     tower.aim_bullets(posX1, posY1, posX2, posY2)
                     pass
 
+                case 3:
+                    if(exp[0] >= 200 and mouse_mask.collided(dice)):
+                        new_cards(screen, res_access)
+
+            
+
     match mode:
         case 1:
             if(selection):
@@ -142,8 +160,13 @@ def render(screen):
 
     draw.line(screen.get_screen(), (255,255, 0), (screen.width/2-exp[0], 10), (screen.width/2+exp[0], 10), width=7)
 
+    screen.draw_text(str(score[0]), (screen.width - int(math.log10(score[0]+1))*15)/2, 50, 40, (255,255,255))
+
     toolbar1.draw()
     toolbar2.draw()
+
+    if(exp[0] >= 200):
+        dice.draw()
     if(selection):
         rect_surface = surface.Surface((abs(posX1 - posX2), abs(posY1 - posY2)), SRCALPHA)
         draw.rect(rect_surface, (255, 255, 255, 150), (0,0, abs(posX1-posX2), abs(posY1-posY2)), width=3)
@@ -156,7 +179,10 @@ def render(screen):
         draw.line(screen.get_screen(), (255, 255, 255), (posX1, posY1), (posX2, posY2), width=3)
 
     if(visible):
-        tower_stats.draw()
-        screen.draw_text(str(int(show_stats[0])), tower_stats.x + 20, tower_stats.y + 10, 20, (255, 0, 0))
-        screen.draw_text(str(int(show_stats[1])), tower_stats.x + 20, tower_stats.y + 40, 20, (0, 255, 0))
-        screen.draw_text(str(int(show_stats[2])), tower_stats.x + 20, tower_stats.y + 70, 20, (0, 0, 255))
+        #tower_stats.draw()
+        for i in (towers[towerI][towerJ].card_sprites):
+            i.draw()
+        
+        # screen.draw_text(str(int(show_stats[0])), tower_stats.x + 20, tower_stats.y + 10, 20, (255, 0, 0))
+        # screen.draw_text(str(int(show_stats[1])), tower_stats.x + 20, tower_stats.y + 40, 20, (0, 255, 0))
+        # screen.draw_text(str(int(show_stats[2])), tower_stats.x + 20, tower_stats.y + 70, 20, (0, 0, 255))

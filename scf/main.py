@@ -25,6 +25,7 @@ def tick():
 
     dt = screen.delta_time()
     timer += dt
+    toolbar.game_timer[0] += dt
 
     if(timer >= 15):
         enemy.generate_enemies(screen, res_access[0],num)
@@ -54,9 +55,24 @@ def tick():
             for j in range(len(entity.towers[i])):
                 if(entity.towers[i][j].collision(toolbar.mouse_mask)):
                     toolbar.visible = True
+                    toolbar.towerI = i
+                    toolbar.towerJ = j
                     toolbar.show_stats[0] = entity.towers[i][j].size
                     toolbar.show_stats[1] = entity.towers[i][j].speed
                     toolbar.show_stats[2] = entity.towers[i][j].cooldown
+                    entity.towers[i][j].show_cards = True
+
+    if(card.set_stat and toolbar.click):
+        for i in range(len(entity.towers)):
+            for j in range(len(entity.towers[i])):
+                if(entity.towers[i][j].collision(toolbar.mouse_mask)):
+                    if(not (card.stat in entity.towers[i][j].stats)):
+                        entity.towers[i][j].stats.append(card.stat)
+                        entity.towers[i][j].execute_stats(res_access[0])
+                        card.set_stat = False
+                        card.stat = None
+                        card.show_select = False
+                    pass
 
 
 def render(screen):

@@ -3,7 +3,7 @@ import random, math
 from datetime import datetime
 import entity
 from resacc import res_access
-from toolbar import exp, exp_change
+from toolbar import exp, exp_change, score, game_timer
 
 def generate_enemies(screen, res_access, N):
     random.seed(str(datetime.now()))
@@ -24,6 +24,8 @@ def generate_enemies(screen, res_access, N):
 
         entity.enemies.append(Enemy(posX, posY, my_sprite))
         entity.enemies[-1].set_move(screen.width/2, screen.height/2)
+        entity.enemies[-1].life = int(game_timer[0]/240) + 1
+        entity.enemies[-1].speed = 10+(math.log2(game_timer[0]/16+1))
         
 
     return
@@ -40,6 +42,7 @@ class Enemy():
         self.x = x
         self.y = y
         self.sprite = sprite
+        self.life = 1
         self.die = False
 
 
@@ -66,22 +69,27 @@ class Enemy():
         self.sprite.y = self.y
 
     def collision(self):
+        global score
         for i in range(len(entity.towers)):
             for j in range(len(entity.towers[i])):
                 if(self.sprite.collided(entity.towers[i][j].sprite)):
-                    self.die = True
+                    self.life -= 1
                     exp[0] -= 30
+                    score[0] = int(score[0]*8/10)
                 for k in entity.towers[i][j].bullets:
-                    distance = ((self.x - k.x[0])**2 + (self.y - k.y[0])**2)**(1/2)
+                    distance = ((self.x - k.x)**2 + (self.y - k.y)**2)**(1/2)
                     if(distance < 20+k.size):
-                        self.die = True
+                        self.life -= 1
                         k.life -= 1
-                        exp[0] += 15/exp_change
+                        exp[0] += 15/exp_change[0]
+                        score[0] += int(10*exp_change[0])
         pass
 
     def tick(self, dt):
         self.move(dt)
         self.collision()
+        if(self.life <= 0):
+            self.die = True
         pass
 
     def render(self):
