@@ -1,9 +1,10 @@
 from pygame import draw, surface, SRCALPHA
-from pplay import sprite, mouse
-import tower
+from pplay import sprite, mouse, sound
+import tower, menu
 from card import new_cards
-from entity import towers
+import entity
 import math
+
 
 mouse_mask = None
 tower_stats = None
@@ -37,6 +38,44 @@ show_stats = [0,0,0]
 towerI = 0
 towerJ = 0
 
+def init(screen, res_access):
+    global mouse_mask, tower_stats, toolbar1, toolbar2, dice, visible, mode, key, mouse_pressed, click, key_pressed, key_released, selection, aim, shoot, posX1, posX2, posY1, posY2, exp, exp_change, score, game_timer, show_stats, towerI, towerJ
+
+    mouse_mask = None
+    tower_stats = None
+    toolbar1 = None
+    toolbar2 = None
+    dice = None
+
+    visible = False
+
+
+    mode = 2
+    key = None
+
+    mouse_pressed = False
+    click = False
+    key_pressed = False
+    key_released = False
+
+    selection = False
+    aim = False
+    shoot = False
+    posX1 = posX2 = posY1 = posY2 = 0
+
+    exp = [100]
+    exp_change = [1]
+
+    score = [0]
+    game_timer = [0]
+
+    show_stats = [0,0,0]
+    towerI = 0
+    towerJ = 0
+
+    init_sprites(screen, res_access)
+
+
 def init_sprites(screen, res_access):
     global mouse_mask, tower_stats, toolbar1, toolbar2, dice, key
 
@@ -60,7 +99,7 @@ def init_sprites(screen, res_access):
     dice.x = screen.width - dice.width*2
     dice.y = screen.height - dice.height*1.5
 
-def tick(res_access, screen):
+def tick(screen, res_access, sound_access):
     global visible, mouse_mask, key, mode, mouse_pressed, key_pressed, key_released, click, selection, aim, shoot, posX1, posX2, posY1, posY2, dice
 
     mouse_mask.x, mouse_mask.y = mouse.Mouse.get_position(mouse)
@@ -73,37 +112,39 @@ def tick(res_access, screen):
     posX2, posY2 = mouse.Mouse.get_position(mouse)
     
     #Pressionou a tecla
-    if(key.key_pressed("1")):
-        if(not key_pressed):
-            key_pressed = True
-            mouse_mask = sprite.Sprite(res_access+"mouse_selection.png")
-            mouse_mask.x = posX2
-            mouse_mask.y = posY2
-            visible = False
-        mode = 1
-    elif(key.key_pressed("2")):
-        if(not key_pressed):
-            key_pressed = True
-            visible = False
-            mouse_mask = sprite.Sprite(res_access+"mouse.png")
-            mouse_mask.x = posX2
-            mouse_mask.y = posY2
-            visible = False
-        mode = 2
-    elif(key.key_pressed("3")):
-        if(not key_pressed):
-            key_pressed = True
-            visible = False
-            mouse_mask = sprite.Sprite(res_access+"mouse.png")
-            mouse_mask.x = posX2
-            mouse_mask.y = posY2
-            tower.release_bullets()
-        mode = 3
-    else:
-        if(key_pressed):
-            #Alguma tecla foi solta:
-            key_released = True
-            key_pressed = False
+    
+    if(menu.current == "Jogar"):
+        if(key.key_pressed("1")):
+            if(not key_pressed):
+                key_pressed = True
+                mouse_mask = sprite.Sprite(res_access+"mouse_selection.png")
+                mouse_mask.x = posX2
+                mouse_mask.y = posY2
+                visible = False
+            mode = 1
+        elif(key.key_pressed("2")):
+            if(not key_pressed):
+                key_pressed = True
+                visible = False
+                mouse_mask = sprite.Sprite(res_access+"mouse.png")
+                mouse_mask.x = posX2
+                mouse_mask.y = posY2
+                visible = False
+            mode = 2
+        elif(key.key_pressed("3")):
+            if(not key_pressed):
+                key_pressed = True
+                visible = False
+                mouse_mask = sprite.Sprite(res_access+"mouse.png")
+                mouse_mask.x = posX2
+                mouse_mask.y = posY2
+                tower.release_bullets()
+            mode = 3
+        else:
+            if(key_pressed):
+                #Alguma tecla foi solta:
+                key_released = True
+                key_pressed = False
 
 
 
@@ -112,51 +153,55 @@ def tick(res_access, screen):
             #O clique começou
 
             mouse_pressed = True
-            
-            match mode:
-                case 1:
-                    if(not key.key_pressed("LEFT_CONTROL")):
-                        tower.release_bullets()
-                    posX1, posY1 = mouse.Mouse.get_position(mouse)
-                    selection = True
-                
-                case 2:
-                    posX1, posY1 = mouse.Mouse.get_position(mouse)
-                    aim = True
+            if(menu.current == "Jogar"):
+                match mode:
+                    case 1:
+                        if(not key.key_pressed("LEFT_CONTROL")):
+                            tower.release_bullets()
+                        posX1, posY1 = mouse.Mouse.get_position(mouse)
+                        selection = True
+                    
+                    case 2:
+                        posX1, posY1 = mouse.Mouse.get_position(mouse)
+                        aim = True
     else:
         if(mouse_pressed):
             #O clique acabou
 
             click = True
             mouse_pressed = False
-            selection = False
-            aim = False
+            if(menu.current == "Jogar"):
+                selection = False
+                aim = False
 
-            match mode:
-                case 2:
-                    tower.aim_bullets(posX1, posY1, posX2, posY2)
-                    pass
+                match mode:
+                    case 2:
+                        tower.aim_bullets(posX1, posY1, posX2, posY2)
+                        pass
 
-                case 3:
-                    if(exp[0] >= 200 and mouse_mask.collided(dice)):
-                        new_cards(screen, res_access)
+                    case 3:
+                        if(exp[0] >= 200 and mouse_mask.collided(dice)):
+                            dice_sound = sound.Sound(sound_access+"dice.wav")
+                            dice_sound.play()
+                            new_cards(screen, res_access, sound_access)
 
             
 
-    match mode:
-        case 1:
-            if(selection):
-                tower.select_bullets(posX1, posY1, posX2, posY2)
+    if(menu.current == "Jogar"):
+        match mode:
+            case 1:
+                if(selection):
+                    tower.select_bullets(posX1, posY1, posX2, posY2)
+                    pass
+            
+            case 2:
+                if(shoot):
+                    pass
                 pass
-        
-        case 2:
-            if(shoot):
-                pass
-            pass
 
 
 def render(screen):
-    global visible, selection, posX1, posX2, posY1, posY2, exp
+    global visible, selection, posX1, posX2, posY1, posY2, exp, towerI, towerJ
 
     draw.line(screen.get_screen(), (255,255, 0), (screen.width/2-exp[0], 10), (screen.width/2+exp[0], 10), width=7)
 
@@ -180,7 +225,7 @@ def render(screen):
 
     if(visible):
         #tower_stats.draw()
-        for i in (towers[towerI][towerJ].card_sprites):
+        for i in (entity.towers[towerI][towerJ].card_sprites):
             i.draw()
         
         # screen.draw_text(str(int(show_stats[0])), tower_stats.x + 20, tower_stats.y + 10, 20, (255, 0, 0))

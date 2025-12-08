@@ -1,7 +1,7 @@
 from pplay import sprite
 from entity import enemies, towers
 from toolbar import init_sprites as init_toolbar
-from background import start as init_background
+from background import init as init_background
 from resacc import res_access
 
 

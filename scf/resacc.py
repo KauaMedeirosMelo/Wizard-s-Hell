@@ -2,7 +2,9 @@ import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 res_access = []
+sound_access = []
 res_access.append(os.path.join(base_dir, "..", "res") + "\\" + "models\\")
+sound_access.append(os.path.join(base_dir, "..", "snd") + "\\")
 
 
 def change_access(name):

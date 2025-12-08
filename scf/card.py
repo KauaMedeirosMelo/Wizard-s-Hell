@@ -1,19 +1,35 @@
-from pplay import sprite
+from pplay import sprite, sound
 import toolbar, entity
 import random
 
-cards = []
+cards = None
 
-types = ["size", "speed", "cooldown", "orbit", "auto"]
+types = None
 
-set_stat = False
+set_stat = None
 stat = None
 
-texts = ["Select one tower", "Upgrade applied to all towers"]
-show_select = False
-show_applied = False
+texts = None
+show_select = None
+show_applied = None
 
 timer = 2
+
+def init():
+    global show_select, show_applied, cards, types, set_stat, stat, texts, timer
+
+    cards = []
+
+    types = ["size", "speed", "cooldown", "orbit", "auto"]
+
+    set_stat = False
+    stat = None
+
+    texts = ["Selecione uma carta", "Upgrade aplicado a todas as torres!"]
+    show_select = False
+    show_applied = False
+
+    timer = 2
 
 def render(screen):
     global show_applied, timer
@@ -38,22 +54,23 @@ def tick(screen, res_access, mouse_mask, dt):
             show_applied = False
             timer = 2
 
-def new_cards(screen, res_access):
+def new_cards(screen, res_access, sound_access):
     toolbar.exp[0] = toolbar.exp[0]/2
     toolbar.exp_change[0] += 0.2
 
     for i in range(3):
         t = 0
         card_type = random.randint(0, 10)
+        card_sound = sound.Sound(sound_access+"card.wav")
         if(card_type > 8):
             t = random.randint(3, 4)
             my_sprite = sprite.Sprite(res_access+types[t]+"_card.png")
-            cards.append(Card(my_sprite, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], False))
+            cards.append(Card(my_sprite, card_sound, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], False))
             pass
         else:
             t = random.randint(0, 2)
             my_sprite = sprite.Sprite(res_access+types[t]+"_card.png")
-            cards.append(Card(my_sprite, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], True))
+            cards.append(Card(my_sprite, card_sound, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], True))
             pass
 
 
@@ -65,12 +82,13 @@ def release_cards():
 
 class Card():
 
-    def __init__(self, sprite, x, y, type, stat):
+    def __init__(self, sprite, sound, x, y, type, stat):
         self.x = x
         self.y = y
         sprite.x = x
         sprite.y = y
         self.sprite = sprite
+        self.sound = sound
         self.stat = stat
 
         self.type = type
@@ -83,6 +101,7 @@ class Card():
         global set_stat, stat, show_select, show_applied
         if(toolbar.click):
             if(self.collision(mouse_mask)):
+                self.sound.play()
                 if(self.stat):
                     for i in range(len(entity.towers)):
                         for j in range(len(entity.towers[i])):

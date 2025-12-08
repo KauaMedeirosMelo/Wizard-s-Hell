@@ -1,6 +1,16 @@
-enemies = []
 
-towers = [[None for i in range(3)] for j in range(3)]
+enemies = None
+
+towers = None
+
+def init():
+    global enemies, towers
+
+    enemies = []
+
+    towers = [[None for i in range(3)] for j in range(3)]
+
+
 
 def tick(mouse_mask, dt):
     for i in range(len(towers)):
