@@ -2,14 +2,14 @@ from pplay import sprite
 import random, math
 from datetime import datetime
 import entity
-from resacc import res_access
+import resacc
 import toolbar
 #from toolbar import exp, exp_change, score, game_timer
 
 def generate_enemies(screen, res_access, N):
     random.seed(str(datetime.now()))
     for i in range(N):
-        my_sprite = sprite.Sprite(res_access+"enemy1.png")
+        my_sprite = sprite.Sprite(resacc.resource_path("res\\models\\"+"enemy1.png"))
         UD = random.randint(0, 1)
         LF = random.randint(0, 1)
 

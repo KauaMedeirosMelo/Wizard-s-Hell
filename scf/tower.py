@@ -1,14 +1,14 @@
 from pygame import draw, surface, SRCALPHA
 from pplay import sprite
 import entity
-from resacc import res_access
+import resacc
 import random as rand
 import math, datetime
 
 def start_towers(screen, res_access):
     for i in range(3):
         for j in range(3):
-            my_sprite = sprite.Sprite(res_access+"torre1.png")
+            my_sprite = sprite.Sprite(resacc.resource_path("res\\models\\torre1.png"))
             posX = (screen.width - my_sprite.width*1.5)/2 + my_sprite.width*(i-1)*1.5
             posY = (screen.height - my_sprite.height)/2 + my_sprite.height*(j-1)*1.5
             entity.towers[i][j] = Tower(posX , posY, my_sprite)
@@ -165,12 +165,12 @@ class Tower():
             match self.stats[i]:
                 case "orbit":
                     self.orbit = True
-                    self.card_sprites.append(sprite.Sprite(res+"orbit_card.png"))
+                    self.card_sprites.append(sprite.Sprite(resacc.resource_path("res\\models\\orbit_card.png")))
                     self.card_sprites[-1].x = 30
                     self.card_sprites[-1].y = 40 + 150*i
                 case "auto":
                     self.auto_shoot = True
-                    self.card_sprites.append(sprite.Sprite(res+"auto_card.png"))
+                    self.card_sprites.append(sprite.Sprite(resacc.resource_path("res\\models\\auto_card.png")))
                     self.card_sprites[-1].x = 30
                     self.card_sprites[-1].y = 40 + 150*i
 

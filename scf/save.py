@@ -1,4 +1,5 @@
 from pplay import sprite
+import resacc
 
 scores = []
 reset = False
@@ -8,10 +9,10 @@ background = None
 def init_score(res_access):
     global background
     
-    background = sprite.Sprite(res_access+"rank_background.png")
+    background = sprite.Sprite(resacc.resource_path("res\\models\\rank_background.png"))
 
 def save_score(score):
-    file_save = open("save//save.txt", "a")
+    file_save = open(resacc.resource_path("save\\save.txt"), "a")
     file_save.write(str(score)+"\n")
     file_save.close()
 
@@ -20,7 +21,7 @@ def define_scores():
     while(len(scores) != 0):
         scores.pop()
     try:
-        with open("save//save.txt", "r") as file_return:
+        with open(resacc.resource_path("save\\save.txt"), "r") as file_return:
             for line in file_return:
                 scores.append((line))
     except FileNotFoundError:

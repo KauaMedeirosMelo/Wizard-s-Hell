@@ -4,7 +4,7 @@ import tower, menu
 from card import new_cards
 import entity
 import math
-
+import resacc
 
 mouse_mask = None
 tower_stats = None
@@ -81,21 +81,21 @@ def init_sprites(screen, res_access):
 
     key = screen.get_keyboard()
 
-    mouse_mask = sprite.Sprite(res_access+"mouse.png")
+    mouse_mask = sprite.Sprite(resacc.resource_path("res\\models\\mouse.png"))
 
 
-    toolbar1 = sprite.Sprite(res_access+"toolbar.png")
-    toolbar2 = sprite.Sprite(res_access+"toolbar.png")
+    toolbar1 = sprite.Sprite(resacc.resource_path("res\\models\\toolbar.png"))
+    toolbar2 = sprite.Sprite(resacc.resource_path("res\\models\\toolbar.png"))
     toolbar1.x = 0
     toolbar2.x = 850
     toolbar1.y = 0
     toolbar2.y = 0
     
-    tower_stats = sprite.Sprite(res_access+"tower_stats.png")
+    tower_stats = sprite.Sprite(resacc.resource_path("res\\models\\tower_stats.png"))
     tower_stats.x = toolbar1.width/2 - tower_stats.width/2
     tower_stats.y = 20 + tower_stats.height*1.2*3
 
-    dice = sprite.Sprite(res_access+"dice.png")
+    dice = sprite.Sprite(resacc.resource_path("res\\models\\dice.png"))
     dice.x = screen.width - dice.width*2
     dice.y = screen.height - dice.height*1.5
 
@@ -117,7 +117,7 @@ def tick(screen, res_access, sound_access):
         if(key.key_pressed("1")):
             if(not key_pressed):
                 key_pressed = True
-                mouse_mask = sprite.Sprite(res_access+"mouse_selection.png")
+                mouse_mask = sprite.Sprite(resacc.resource_path("res\\models\\mouse_selection.png"))
                 mouse_mask.x = posX2
                 mouse_mask.y = posY2
                 visible = False
@@ -126,7 +126,7 @@ def tick(screen, res_access, sound_access):
             if(not key_pressed):
                 key_pressed = True
                 visible = False
-                mouse_mask = sprite.Sprite(res_access+"mouse.png")
+                mouse_mask = sprite.Sprite(resacc.resource_path("res\\models\\mouse.png"))
                 mouse_mask.x = posX2
                 mouse_mask.y = posY2
                 visible = False
@@ -135,7 +135,7 @@ def tick(screen, res_access, sound_access):
             if(not key_pressed):
                 key_pressed = True
                 visible = False
-                mouse_mask = sprite.Sprite(res_access+"mouse.png")
+                mouse_mask = sprite.Sprite(resacc.resource_path("res\\models\\mouse.png"))
                 mouse_mask.x = posX2
                 mouse_mask.y = posY2
                 tower.release_bullets()
@@ -181,7 +181,7 @@ def tick(screen, res_access, sound_access):
 
                     case 3:
                         if(exp[0] >= 200 and mouse_mask.collided(dice)):
-                            dice_sound = sound.Sound(sound_access+"dice.wav")
+                            dice_sound = sound.Sound(resacc.resource_path("snd\\dice.wav"))
                             dice_sound.play()
                             new_cards(screen, res_access, sound_access)
 

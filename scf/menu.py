@@ -1,4 +1,5 @@
 from pplay import sprite, sound
+import resacc
 
 
 current = "Menu"
@@ -8,20 +9,20 @@ background = None
 def init_menu(screen, res_access, sound_access):
     global main_buttons, background
 
-    button_sound = sound.Sound(sound_access+"button.wav")
+    button_sound = sound.Sound(resacc.resource_path("snd\\button.wav"))
     button_sound.set_volume(100)
 
-    jogar_sprite = sprite.Sprite(res_access+"jogar.png")
+    jogar_sprite = sprite.Sprite(resacc.resource_path("res\\models\\jogar.png"))
     jogar = Button(jogar_sprite, button_sound, (screen.width + 2*jogar_sprite.width)/2, 250, "Jogar", main_buttons)
 
-    sair_sprite = sprite.Sprite(res_access+"sair.png")
+    sair_sprite = sprite.Sprite(resacc.resource_path("res\\models\\sair.png"))
     sair = Button(sair_sprite, button_sound, (screen.width + 2*sair_sprite.width)/2, 450, "Sair", main_buttons)
 
 
     main_buttons.append(jogar)
     main_buttons.append(sair)
 
-    background = sprite.Sprite(res_access+"menu_background.png")
+    background = sprite.Sprite(resacc.resource_path("res\\models\\menu_background.png"))
 
     pass
 

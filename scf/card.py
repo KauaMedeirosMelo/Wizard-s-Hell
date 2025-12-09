@@ -1,5 +1,5 @@
 from pplay import sprite, sound
-import toolbar, entity
+import toolbar, entity, resacc
 import random
 
 cards = None
@@ -25,7 +25,7 @@ def init():
     set_stat = False
     stat = None
 
-    texts = ["Selecione uma carta", "Upgrade aplicado a todas as torres!"]
+    texts = ["Selecione uma torre", "Upgrade aplicado a todas as torres!"]
     show_select = False
     show_applied = False
 
@@ -61,15 +61,15 @@ def new_cards(screen, res_access, sound_access):
     for i in range(3):
         t = 0
         card_type = random.randint(0, 10)
-        card_sound = sound.Sound(sound_access+"card.wav")
+        card_sound = sound.Sound(resacc.resource_path("snd\\card.wav"))
         if(card_type > 8):
             t = random.randint(3, 4)
-            my_sprite = sprite.Sprite(res_access+types[t]+"_card.png")
+            my_sprite = sprite.Sprite(resacc.resource_path("res\\models\\"+types[t]+"_card.png"))
             cards.append(Card(my_sprite, card_sound, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], False))
             pass
         else:
             t = random.randint(0, 2)
-            my_sprite = sprite.Sprite(res_access+types[t]+"_card.png")
+            my_sprite = sprite.Sprite(resacc.resource_path("res\\models\\"+types[t]+"_card.png"))
             cards.append(Card(my_sprite, card_sound, screen.width - my_sprite.width*1.25, 20 + my_sprite.height*i*1.2, types[t], True))
             pass
 
