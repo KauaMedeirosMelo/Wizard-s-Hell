@@ -29,7 +29,7 @@ def define_scores():
 
     for i in range(len(scores)):
         for j in range(len(scores) - i - 1):
-            if(scores[j] < scores[j+1]):
+            if(int(scores[j]) < int(scores[j+1])):
                 scores[j], scores[j+1] = scores[j+1], scores[j]
 
     scores = scores[:3]
