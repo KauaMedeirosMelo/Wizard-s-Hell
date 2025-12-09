@@ -26,7 +26,7 @@ def generate_enemies(screen, res_access, N):
         entity.enemies.append(Enemy(posX, posY, my_sprite))
         entity.enemies[-1].set_move(screen.width/2, screen.height/2)
         entity.enemies[-1].life = int(toolbar.game_timer[0]/240) + 1
-        entity.enemies[-1].speed = 10+(math.log2(toolbar.game_timer[0]/64+1))
+        entity.enemies[-1].speed = 8+(math.log2(toolbar.game_timer[0]/64+1)/2)
         
 
     return
@@ -61,7 +61,6 @@ class Enemy():
             
             self.angle = angle
             self.dir = dir
-            self.speed = 10
 
     def move(self, dt):
         self.x = self.x - math.cos(self.angle)*self.speed*dt
@@ -76,14 +75,14 @@ class Enemy():
                 if(self.sprite.collided(entity.towers[i][j].sprite)):
                     self.life -= 1
                     toolbar.exp[0] -= 30
-                    toolbar.score[0] = int(score[0]*8/10)
+                    toolbar.score[0] = int(toolbar.score[0]*8/10)
                 for k in entity.towers[i][j].bullets:
                     distance = ((self.x - k.x)**2 + (self.y - k.y)**2)**(1/2)
                     if(distance < 20+k.size):
                         self.life -= 1
                         k.life -= 1
-                        toolbar.exp[0] += 15/toolbar.exp_change[0]
-                        toolbar.score[0] += int(10*toolbar.exp_change[0])
+                        toolbar.exp[0] += 20/toolbar.exp_change[0]
+                        toolbar.score[0] += int(15*toolbar.exp_change[0])
         pass
 
     def tick(self, dt):

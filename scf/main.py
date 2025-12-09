@@ -1,7 +1,7 @@
 from pplay import window, sprite, mouse
 from pygame import display, NOFRAME
 from resacc import res_access, change_access, sound_access
-import entity, tower, background, enemy, toolbar, models, card, menu
+import entity, tower, background, enemy, toolbar, models, card, menu, save
 
 event = False
 
@@ -55,6 +55,17 @@ def tick():
                         menu.current = menu.main_buttons[i].state
                         mouse.Mouse.hide(mouse)
                 pass
+            
+            
+            if(key.key_pressed("r")):
+                save.init_score(res_access[0])
+                save.define_scores()
+                menu.current = "Rank"
+                
+        
+        case "Rank":
+            if(key.key_pressed("esc")):
+                menu.current = "Menu"
 
         case "Jogar":
             timer += dt
@@ -73,15 +84,15 @@ def tick():
                 mouse.Mouse.unhide(mouse)
                 menu.current = "Menu"
 
-            if(key.key_pressed("p")):
-                change_access("models")
-
             if(key.key_pressed("space")):
                 models.change_models(screen)
 
             toolbar.tick(screen, res_access[0], sound_access[0])
             if(toolbar.exp[0] <= 0):
-                screen.close()
+                save.save_score(toolbar.score[0])
+                init_master(screen, res_access)
+                mouse.Mouse.unhide(mouse)
+                menu.current = "Menu"
 
             if(toolbar.click and toolbar.mode == 3):
                 for i in range(len(entity.towers)):
@@ -113,23 +124,27 @@ def tick():
 
 
 def render(screen):
+    screen.set_background_color((0,0,0))
     match menu.current:
 
         case "Menu":
-            screen.set_background_color((0,0,0))
+            menu.background.draw()
             for i in menu.main_buttons:
                 i.render()
-            screen.update()
             pass
         
+        case "Rank":
+            save.render(screen)
+
         case "Jogar":
-            screen.set_background_color((0,0,0))
+            
             background.render()
             entity.render(screen)
             toolbar.render(screen)
             card.render(screen)
             toolbar.mouse_mask.draw()
-            screen.update()
+
+    screen.update()
 
 while(True):
 

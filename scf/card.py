@@ -56,7 +56,7 @@ def tick(screen, res_access, mouse_mask, dt):
 
 def new_cards(screen, res_access, sound_access):
     toolbar.exp[0] = toolbar.exp[0]/2
-    toolbar.exp_change[0] += 0.2
+    toolbar.exp_change[0] += 0.15
 
     for i in range(3):
         t = 0

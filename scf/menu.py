@@ -3,22 +3,25 @@ from pplay import sprite, sound
 
 current = "Menu"
 main_buttons = []
+background = None
 
 def init_menu(screen, res_access, sound_access):
-    global main_buttons
+    global main_buttons, background
 
     button_sound = sound.Sound(sound_access+"button.wav")
     button_sound.set_volume(100)
 
     jogar_sprite = sprite.Sprite(res_access+"jogar.png")
-    jogar = Button(jogar_sprite, button_sound, (screen.width + jogar_sprite.width)/2, 200, "Jogar", main_buttons)
+    jogar = Button(jogar_sprite, button_sound, (screen.width + 2*jogar_sprite.width)/2, 250, "Jogar", main_buttons)
 
     sair_sprite = sprite.Sprite(res_access+"sair.png")
-    sair = Button(sair_sprite, button_sound, (screen.width + sair_sprite.width)/2, 400, "Sair", main_buttons)
+    sair = Button(sair_sprite, button_sound, (screen.width + 2*sair_sprite.width)/2, 450, "Sair", main_buttons)
 
 
     main_buttons.append(jogar)
     main_buttons.append(sair)
+
+    background = sprite.Sprite(res_access+"menu_background.png")
 
     pass
 
